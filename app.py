@@ -17,7 +17,6 @@ app.config['JWT_SECRET_KEY'] = '1e7dd83518f2d903c057c42349ac878e'
 
 jwt = JWTManager(app)
 
-db.init_app(app)
 Migrate(app, db)  # Provides migrate capability
 
 
