@@ -15,6 +15,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['JWT_SECRET_KEY'] = '1e7dd83518f2d903c057c42349ac878e'
 
 jwt = JWTManager(app)
+db.init_app(app)
+
+
+@app.before_first_request
+def create_tables():
+    db.create_all()
 
 
 @app.route('/')
