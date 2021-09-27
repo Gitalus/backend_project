@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_migrate import Migrate
 from db import db
 from models.user import User
 from datetime import timedelta
@@ -16,8 +15,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['JWT_SECRET_KEY'] = '1e7dd83518f2d903c057c42349ac878e'
 
 jwt = JWTManager(app)
-
-Migrate(app, db)  # Provides migrate capability
 
 
 @app.route('/')
