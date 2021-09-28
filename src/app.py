@@ -21,7 +21,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = os.environ.get(
     'JWT_SECRET_KEY', 'development_only')
 
-uri = os.getenv("DATABASE_URL")  # or other relevant config var
+# or other relevant config var
+uri = os.getenv("DATABASE_URL", "sqlite:///database.db")
 if uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
 # rest of connection code using the connection string `uri`
