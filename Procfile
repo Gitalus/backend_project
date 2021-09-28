@@ -1,2 +1,2 @@
-release: pipenv run upgrade
+release: flask db upgrade
 web: uwsgi uwsgi.ini
