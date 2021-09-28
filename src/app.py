@@ -13,10 +13,14 @@ app.url_map.slashes = False
 app.config['DEBUG'] = True
 app.config['ENV'] = 'development'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-    'DATABASE_URL', 'sqlite:///database.db')
 app.config['JWT_SECRET_KEY'] = os.environ.get(
     'JWT_SECRET_KEY', 'development_only')
+
+uri = os.getenv("DATABASE_URL")  # or other relevant config var
+if uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+# rest of connection code using the connection string `uri`
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
 
 jwt = JWTManager(app)
 db.init_app(app)
