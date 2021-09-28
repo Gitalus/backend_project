@@ -8,6 +8,7 @@ class User(db.Model):
     username = db.Column(db.String(100), nullable=False, unique=True)
     email = db.Column(db.String(200), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)
+    confirmed_email = db.Column(db.Boolean, server_default="f")
 
     def serialize(self):
         return {

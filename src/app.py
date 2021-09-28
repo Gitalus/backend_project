@@ -1,5 +1,6 @@
 import os
 
+from flask_mail import Mail, Message
 from flask import Flask, jsonify, request
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -7,6 +8,8 @@ from db import db
 from flask_cors import CORS
 from models.user import User
 from datetime import timedelta
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired
+
 
 # app config
 app = Flask(__name__)
@@ -25,6 +28,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = uri
 
 jwt = JWTManager(app)
 db.init_app(app)
+mail = Mail(app)
+s = URLSafeTimedSerializer(app.config['JWT_SECRET_KEY'])
 
 CORS(app)
 
@@ -54,7 +59,7 @@ def login():
         expires_delta=timedelta(hours=5)
     )
 
-    return jsonify(acces_token=token)
+    return jsonify(access_token=token)
 
 
 @app.route('/api/register', methods=['POST'])
@@ -84,7 +89,21 @@ def register():
         email=email)
 
     user.save()
-    return jsonify(message=f"username '{username}' created.", status="ok")
+    emailToken = s.dumps(email, salt='email-confirm')
+    return jsonify(email=email,
+                   username=username,
+                   token_confirm=emailToken,
+                   status="ok"
+                   )
+
+
+@app.route('/confirm_email/<token>')
+def confirm_email(token):
+    try:
+        email = s.loads(token, salt='email-confirm', max_age=120)
+    except SignatureExpired:
+        return jsonify(message="The token is expired.")
+    return jsonify(status="confirmed")
 
 
 if __name__ == '__main__':
