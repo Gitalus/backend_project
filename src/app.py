@@ -81,7 +81,7 @@ def register():
         email=email)
 
     user.save()
-    return jsonify(message=f"username '{username}' created.")
+    return jsonify(message=f"username '{username}' created.", status="ok")
 
 
 if __name__ == '__main__':
