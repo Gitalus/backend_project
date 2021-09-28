@@ -95,7 +95,7 @@ def register():
     emailToken = s.dumps(email, salt='email-confirm')
     msg = Message('Confirm Email',
                   sender='serenity@serenityapp.com', recipients=[email])
-    link = url_for('confirm_email', emailToken, _external=True)
+    link = url_for('confirm_email', token=emailToken, _external=True)
 
     msg.body = f'Your link is {link}'
 
