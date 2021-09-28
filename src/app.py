@@ -75,6 +75,9 @@ def register():
     if username is None and password is None and email is None:
         return jsonify(message="You must include a username, a password and an email.", status="error"), 400
 
+    if username == "" and password == "" and email == "":
+        return jsonify(message="You must include a username, a password and an email.", status="error"), 400
+
     user = User(
         username=username,
         password=generate_password_hash(password),
