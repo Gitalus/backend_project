@@ -66,14 +66,14 @@ def register():
     user = User.query.filter_by(username=username).first()
 
     if user:
-        return jsonify(message=f"User '{username}' already exists."), 400
+        return jsonify(message=f"User '{username}' already exists.", status="error"), 400
 
     user = User.query.filter_by(email=email).first()
     if user:
-        return jsonify(message=f"E-mail '{email}' already in use."), 400
+        return jsonify(message=f"E-mail '{email}' already in use.", status="error"), 400
 
     if username is None and password is None and email is None:
-        return jsonify(message="You must include a username, a password and an email."), 400
+        return jsonify(message="You must include a username, a password and an email.", status="error"), 400
 
     user = User(
         username=username,
