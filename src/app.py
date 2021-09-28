@@ -5,6 +5,7 @@ from flask import Flask, jsonify, request, url_for
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from werkzeug.security import generate_password_hash, check_password_hash
 from db import db
+from flask_migrate import Migrate
 from flask_cors import CORS
 from models.user import User
 from datetime import timedelta
@@ -26,6 +27,7 @@ if uri.startswith("postgres://"):
 # rest of connection code using the connection string `uri`
 app.config['SQLALCHEMY_DATABASE_URI'] = uri
 
+MIGRATE = Migrate(app, db)
 jwt = JWTManager(app)
 db.init_app(app)
 mail = Mail(app)
