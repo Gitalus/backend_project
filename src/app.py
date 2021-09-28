@@ -1,6 +1,6 @@
 import os
 
-from flask_mail import Mail, Message
+# from flask_mail import Mail, Message
 from flask import Flask, jsonify, request
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -28,8 +28,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = uri
 
 jwt = JWTManager(app)
 db.init_app(app)
-mail = Mail(app)
-s = URLSafeTimedSerializer(app.config['JWT_SECRET_KEY'])
+# mail = Mail(app)
+# s = URLSafeTimedSerializer(app.config['JWT_SECRET_KEY'])
 
 CORS(app)
 
@@ -89,21 +89,20 @@ def register():
         email=email)
 
     user.save()
-    emailToken = s.dumps(email, salt='email-confirm')
+    # emailToken = s.dumps(email, salt='email-confirm')
     return jsonify(email=email,
                    username=username,
-                   token_confirm=emailToken,
                    status="ok"
                    )
 
 
-@app.route('/confirm_email/<token>')
-def confirm_email(token):
-    try:
-        email = s.loads(token, salt='email-confirm', max_age=120)
-    except SignatureExpired:
-        return jsonify(message="The token is expired.")
-    return jsonify(status="confirmed")
+# @app.route('/confirm_email/<token>')
+# def confirm_email(token):
+#     try:
+#         email = s.loads(token, salt='email-confirm', max_age=120)
+#     except SignatureExpired:
+#         return jsonify(message="The token is expired.")
+#     return jsonify(status="confirmed")
 
 
 if __name__ == '__main__':

@@ -3,6 +3,6 @@ Flask-JWT-Extended
 Flask-SQLAlchemy
 uwsgi
 flask-cors
-flask-mail
+# flask-mail
 # library to interact with postgre:
 psycopg2
