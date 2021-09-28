@@ -4,6 +4,7 @@ from flask import Flask, jsonify, request
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from werkzeug.security import generate_password_hash, check_password_hash
 from db import db
+from flask_cors import CORS
 from models.user import User
 from datetime import timedelta
 
@@ -24,6 +25,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = uri
 
 jwt = JWTManager(app)
 db.init_app(app)
+
+CORS(app)
 
 
 @app.before_first_request
