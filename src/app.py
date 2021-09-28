@@ -25,7 +25,7 @@ def create_tables():
 
 @app.route('/')
 def get_home():
-    return "<h1>Home</h1>"
+    return "<h1>Serenity REST API</h1>"
 
 
 @app.route('/api/auth', methods=['POST'])
