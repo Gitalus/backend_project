@@ -16,6 +16,12 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 app = Flask(__name__)
 app.url_map.slashes = False
 app.config['DEBUG'] = True
+app.config['MAIL_SERVER'] = "smtp.gmail.com"
+app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
+app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
 app.config['ENV'] = 'development'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = os.environ.get(
@@ -94,10 +100,10 @@ def register():
     user.save()
     emailToken = s.dumps(email, salt='email-confirm')
     msg = Message('Confirm Email',
-                  sender='serenity@serenityapp.com', recipients=[email])
+                  sender=app.config['MAIL_USERNAME'], recipients=[email])
     link = url_for('confirm_email', token=emailToken, _external=True)
 
-    msg.body = f'Your link is {link}'
+    msg.body = f'Your link is: {link}'
 
     mail.send(msg)
 
