@@ -8,12 +8,16 @@ class User(db.Model):
     username = db.Column(db.String(100), nullable=False, unique=True)
     email = db.Column(db.String(200), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)
-    # confirmed_email = db.Column(db.Boolean, server_default="f")
+
+    profile_id = db.Column(db.Integer, db.ForeignKey(
+        'profiles.id'), unique=True)
+    profile = db.relationship('Profile', backref='user', uselist=False)
 
     def serialize(self):
         return {
             "username": self.username,
-            "email": self.email
+            "email": self.email,
+            "profile_name": self.profile.name
         }
 
     def save(self):

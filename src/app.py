@@ -7,6 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from db import db
 from flask_migrate import Migrate
 from flask_cors import CORS
+from models.profile import Profile
 from models.user import User
 from datetime import timedelta
 
@@ -83,16 +84,24 @@ def register():
     if username == "" and password == "" and email == "":
         return jsonify(message="You must include a username, a password and an email.", status="error"), 400
 
+    newProfile = Profile()
     user = User(
         username=username,
         password=generate_password_hash(password),
-        email=email)
+        email=email,
+        profile=newProfile)
 
     user.save()
+
     return jsonify(email=email,
                    username=username,
                    status="ok"
                    )
+
+
+@app.route('/api/users')
+def get_users():
+    return jsonify(users=[user.serialize() for user in User.query.all()])
 
 
 if __name__ == '__main__':
