@@ -17,7 +17,7 @@ class User(db.Model):
         return {
             "username": self.username,
             "email": self.email,
-            "profile_name": self.profile.name
+            "profile": self.profile.serialize()
         }
 
     def save(self):

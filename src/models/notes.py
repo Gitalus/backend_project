@@ -12,7 +12,7 @@ class Note(db.Model):
     categoria = db.Column(db.String(100))
 
     profile_id = db.Column(
-        db.Integer, db.ForeignKey('profiles.id'), unique=True)
+        db.Integer, db.ForeignKey('profiles.id'))
     profile = db.relationship('Profile', backref='notes')
 
     def serialize(self):
