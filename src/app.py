@@ -105,6 +105,18 @@ def get_users():
     return jsonify(users=[user.serialize() for user in User.query.all()])
 
 
+@app.route('/api/profile', methods=['PUT'])
+@jwt_required()
+def update_profile():
+    name = request.json.get('name')
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    user.profile.name = name
+    user.save()
+
+    return jsonify(user.profile.serialize())
+
+
 @app.route('/api/note', methods=['POST'])
 @jwt_required()
 def create_note():
