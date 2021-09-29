@@ -57,7 +57,7 @@ def login():
         return jsonify(message="Bad username or password."), 400
 
     token = create_access_token(
-        identity=user.username,
+        identity=user.id,
         expires_delta=timedelta(hours=5)
     )
 
@@ -106,12 +106,16 @@ def get_users():
 
 
 @app.route('/api/note', methods=['POST'])
+@jwt_required()
 def create_note():
     nota = Note()
     nota.titulo = request.json.get('titulo')
     nota.contenido = request.json.get('contenido')
     nota.categoria = request.json.get('categoria')
-    nota.profile_id = 1
+
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    nota.profile = user.profile
     nota.save()
 
     return jsonify(nota.serialize())
