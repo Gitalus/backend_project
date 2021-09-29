@@ -6,7 +6,7 @@ class Profile(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), default="")
-    avatar = db.Column(db.BLOB)
+    # avatar = db.Column(db.BLOB)
 
     def serialize(self):
         return {
