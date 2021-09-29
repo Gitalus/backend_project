@@ -58,7 +58,7 @@ def login():
 
     token = create_access_token(
         identity=user.id,
-        expires_delta=timedelta(hours=5)
+        expires_delta=timedelta(weeks=1)
     )
 
     return jsonify(access_token=token)
@@ -119,6 +119,17 @@ def create_note():
     nota.save()
 
     return jsonify(nota.serialize())
+
+
+@app.route('/api/tokencheck', methods=['POST'])
+@jwt_required()
+def check_token():
+    user_id = get_jwt_identity()
+    token = create_access_token(
+        identity=user_id,
+        expires_delta=timedelta(weeks=1)
+    )
+    return jsonify(access_token=token)
 
 
 if __name__ == '__main__':
