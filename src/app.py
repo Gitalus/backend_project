@@ -7,6 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from db import db
 from flask_migrate import Migrate
 from flask_cors import CORS
+from models.notes import Note
 from models.profile import Profile
 from models.user import User
 from datetime import timedelta
@@ -102,6 +103,18 @@ def register():
 @app.route('/api/users')
 def get_users():
     return jsonify(users=[user.serialize() for user in User.query.all()])
+
+
+@app.route('/api/note', methods=['POST'])
+def create_note():
+    nota = Note()
+    nota.titulo = request.json.get('titulo')
+    nota.contenido = request.json.get('contenido')
+    nota.categoria = request.json.get('categoria')
+    nota.profile_id = 1
+    nota.save()
+
+    return jsonify(nota.serialize())
 
 
 if __name__ == '__main__':
