@@ -5,10 +5,10 @@ from flask import Flask, jsonify, request
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from werkzeug.security import generate_password_hash, check_password_hash
 from db import db
+from flask_migrate import Migrate
 from flask_cors import CORS
 from models.user import User
 from datetime import timedelta
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
 
 # app config
@@ -20,7 +20,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['JWT_SECRET_KEY'] = os.environ.get(
     'JWT_SECRET_KEY', 'development_only')
 
-uri = os.getenv("DATABASE_URL")  # or other relevant config var
+# or other relevant config var
+uri = os.getenv("DATABASE_URL", "sqlite:///database.db")
 if uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
 # rest of connection code using the connection string `uri`
@@ -28,8 +29,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = uri
 
 jwt = JWTManager(app)
 db.init_app(app)
-# mail = Mail(app)
-# s = URLSafeTimedSerializer(app.config['JWT_SECRET_KEY'])
+MIGRATE = Migrate(app, db)
 
 CORS(app)
 
@@ -89,20 +89,10 @@ def register():
         email=email)
 
     user.save()
-    # emailToken = s.dumps(email, salt='email-confirm')
     return jsonify(email=email,
                    username=username,
                    status="ok"
                    )
-
-
-# @app.route('/confirm_email/<token>')
-# def confirm_email(token):
-#     try:
-#         email = s.loads(token, salt='email-confirm', max_age=120)
-#     except SignatureExpired:
-#         return jsonify(message="The token is expired.")
-#     return jsonify(status="confirmed")
 
 
 if __name__ == '__main__':
