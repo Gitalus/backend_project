@@ -38,7 +38,7 @@ MIGRATE = Migrate(app, db)
 jwt = JWTManager(app)
 db.init_app(app)
 mail = Mail(app)
-s = URLSafeTimedSerializer(app.config['JWT_SECRET_KEY'])
+serializer = URLSafeTimedSerializer(app.config['JWT_SECRET_KEY'])
 
 CORS(app)
 
@@ -98,7 +98,7 @@ def register():
         email=email)
 
     user.save()
-    emailToken = s.dumps(email, salt='email-confirm')
+    emailToken = serializer.dumps(email, salt='asdasdaseqwe123123')
     msg = Message('Confirm Email',
                   sender=app.config['MAIL_USERNAME'], recipients=[email])
     link = url_for('confirm_email', token=emailToken, _external=True)
@@ -116,7 +116,7 @@ def register():
 @app.route('/confirm_email/<token>')
 def confirm_email(token):
     try:
-        email = s.loads(token, salt='email-confirm', max_age=120)
+        email = serializer.loads(token, salt='email-confirm', max_age=120)
     except SignatureExpired:
         return jsonify(message="The token is expired.")
     return jsonify(status="confirmed")
