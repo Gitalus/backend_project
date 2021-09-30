@@ -117,6 +117,15 @@ def update_profile():
     return jsonify(user.perfil.serialize())
 
 
+@app.route('/api/profile')
+@jwt_required()
+def get_profile():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    return jsonify(user.perfil.serialize())
+
+
 @app.route('/api/note', methods=['POST'])
 @jwt_required()
 def create_note():
