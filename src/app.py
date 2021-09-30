@@ -48,13 +48,13 @@ def get_home():
 
 @app.route('/api/auth', methods=['POST'])
 def login():
-    username = request.json.get('username', None)
+    nombre_usuario = request.json.get('nombre_usuario', None)
     password = request.json.get('password', None)
-    user = User.query.filter_by(username=username).first()
+    user = User.query.filter_by(nombre_usuario=nombre_usuario).first()
 
     if user is None or not check_password_hash(user.password, password):
 
-        return jsonify(message="Bad username or password."), 400
+        return jsonify(message="Mal nombre de usuario o contraseña."), 400
 
     token = create_access_token(
         identity=user.id,
@@ -66,36 +66,36 @@ def login():
 
 @app.route('/api/register', methods=['POST'])
 def register():
-    username = request.json.get('username', None)
+    nombre_usuario = request.json.get('nombre_usuario', None)
     password = request.json.get('password', None)
     email = request.json.get('email', None)
 
-    user = User.query.filter_by(username=username).first()
+    user = User.query.filter_by(nombre_usuario=nombre_usuario).first()
 
     if user:
-        return jsonify(message=f"User '{username}' already exists.", status="error"), 400
+        return jsonify(message=f"El usuario '{nombre_usuario}' ya existe.", status="error"), 400
 
     user = User.query.filter_by(email=email).first()
     if user:
-        return jsonify(message=f"E-mail '{email}' already in use.", status="error"), 400
+        return jsonify(message=f"E-mail '{email}' ya está en uso.", status="error"), 400
 
-    if username is None and password is None and email is None:
-        return jsonify(message="You must include a username, a password and an email.", status="error"), 400
+    if nombre_usuario is None and password is None and email is None:
+        return jsonify(message="Debes incluir un nombre de usuario, email y contraeña.", status="error"), 400
 
-    if username == "" and password == "" and email == "":
-        return jsonify(message="You must include a username, a password and an email.", status="error"), 400
+    if nombre_usuario == "" and password == "" and email == "":
+        return jsonify(message="Debes incluir un nombre de usuario, email y contraeña.", status="error"), 400
 
     newProfile = Profile()
     user = User(
-        username=username,
+        nombre_usuario=nombre_usuario,
         password=generate_password_hash(password),
         email=email,
-        profile=newProfile)
+        perfil=newProfile)
 
     user.save()
 
     return jsonify(email=email,
-                   username=username,
+                   nombre_usuario=nombre_usuario,
                    status="ok"
                    )
 
@@ -108,13 +108,13 @@ def get_users():
 @app.route('/api/profile', methods=['PUT'])
 @jwt_required()
 def update_profile():
-    name = request.json.get('name')
+    nombre = request.json.get('nombre')
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
-    user.profile.name = name
+    user.perfil.nombre = nombre
     user.save()
 
-    return jsonify(user.profile.serialize())
+    return jsonify(user.perfil.serialize())
 
 
 @app.route('/api/note', methods=['POST'])
@@ -127,7 +127,7 @@ def create_note():
 
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
-    nota.profile = user.profile
+    nota.perfil = user.perfil
     nota.save()
 
     return jsonify(nota.serialize())

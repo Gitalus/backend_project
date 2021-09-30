@@ -5,19 +5,19 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), nullable=False, unique=True)
+    nombre_usuario = db.Column(db.String(100), nullable=False, unique=True)
     email = db.Column(db.String(200), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)
 
-    profile_id = db.Column(db.Integer, db.ForeignKey(
+    perfil_id = db.Column(db.Integer, db.ForeignKey(
         'profiles.id'), unique=True)
-    profile = db.relationship('Profile', backref='user', uselist=False)
+    perfil = db.relationship('Profile', backref='usuario', uselist=False)
 
     def serialize(self):
         return {
-            "username": self.username,
+            "nombre_usuario": self.nombre_usuario,
             "email": self.email,
-            "profile": self.profile.serialize()
+            "perfil": self.perfil.serialize()
         }
 
     def save(self):

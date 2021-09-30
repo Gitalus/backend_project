@@ -11,9 +11,9 @@ class Note(db.Model):
     fecha = db.Column(db.Date, default=date.today())
     categoria = db.Column(db.String(100))
 
-    profile_id = db.Column(
+    perfil_id = db.Column(
         db.Integer, db.ForeignKey('profiles.id'))
-    profile = db.relationship('Profile', backref='notes')
+    perfil = db.relationship('Profile', backref='notas')
 
     def serialize(self):
         return {
@@ -21,7 +21,7 @@ class Note(db.Model):
             "contenido": self.contenido,
             "fecha": self.fecha,
             "categoria": self.categoria,
-            "usuario": self.profile.name
+            "usuario": self.perfil.nombre
         }
 
     def save(self):
