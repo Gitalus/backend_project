@@ -17,7 +17,7 @@ class Note(db.Model):
 
     def serialize(self):
         return {
-            "title": self.titulo,
+            "titulo": self.titulo,
             "contenido": self.contenido,
             "fecha": self.fecha,
             "categoria": self.categoria,
