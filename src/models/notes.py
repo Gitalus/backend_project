@@ -1,5 +1,5 @@
 from db import db
-from datetime import date
+from datetime import datetime
 
 
 class Note(db.Model):
@@ -8,7 +8,7 @@ class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     titulo = db.Column(db.String(200), default="")
     contenido = db.Column(db.Text, default="")
-    fecha = db.Column(db.Date, default=date.today())
+    fecha = db.Column(db.Date, default=datetime.now())
     categoria = db.Column(db.String(100))
 
     perfil_id = db.Column(
