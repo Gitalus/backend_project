@@ -153,5 +153,17 @@ def check_token():
     return jsonify(access_token=token)
 
 
+@app.route('/api/note/<int:_id>', methods=['DELETE'])
+@jwt_required()
+def delete_note(_id):
+    note = Note.query.get(_id)
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    user.perfil.notas.remove(note)
+    user.save()
+
+    return jsonify(user.perfil.serialize())
+
+
 if __name__ == '__main__':
     app.run()

@@ -21,7 +21,8 @@ class Note(db.Model):
             "contenido": self.contenido,
             "fecha": self.fecha,
             "categoria": self.categoria,
-            "usuario": self.perfil.nombre
+            "usuario": self.perfil.nombre,
+            "id": self.id
         }
 
     def save(self):
