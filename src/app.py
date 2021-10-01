@@ -114,7 +114,7 @@ def update_profile():
     user.perfil.nombre = nombre
     user.save()
 
-    return jsonify(user.perfil.serialize())
+    return jsonify(user.serialize())
 
 
 @app.route('/api/profile')
@@ -123,7 +123,7 @@ def get_profile():
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
 
-    return jsonify(user.perfil.serialize())
+    return jsonify(user.serialize())
 
 
 @app.route('/api/note', methods=['POST'])
@@ -162,7 +162,7 @@ def delete_note(_id):
     user.perfil.notas.remove(note)
     user.save()
 
-    return jsonify(user.perfil.serialize())
+    return jsonify(user.serialize())
 
 
 if __name__ == '__main__':
