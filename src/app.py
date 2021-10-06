@@ -8,6 +8,7 @@ from db import db
 from flask_migrate import Migrate
 from flask_cors import CORS
 from models.notes import Note
+from models.calendar import Fecha
 from models.profile import Profile
 from models.user import User
 from datetime import timedelta
@@ -140,6 +141,20 @@ def create_note():
     nota.save()
 
     return jsonify(nota.serialize())
+
+
+@app.route('/api/calendar', methods=['POST'])
+@jwt_required()
+def save_calendar():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    user.perfil.calendario = []
+    for fecha, category in request.get_json().items():
+        newFecha = Fecha(fecha=fecha, category=category)
+        user.perfil.calendario.append(newFecha)
+    user.save()
+
+    return jsonify(message="added_calendar")
 
 
 @app.route('/api/tokencheck', methods=['POST'])
