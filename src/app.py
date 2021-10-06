@@ -88,11 +88,11 @@ def register():
         return jsonify(message="Debes incluir un nombre de usuario, email y contraeña.", status="error"), 400
 
     newProfile = Profile()
+    newProfile.avatar = user_img
     user = User(
         nombre_usuario=nombre_usuario,
         password=generate_password_hash(password),
         email=email,
-        avatar=user_img,
         perfil=newProfile)
 
     user.save()
