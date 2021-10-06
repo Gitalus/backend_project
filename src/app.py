@@ -70,6 +70,7 @@ def register():
     nombre_usuario = request.json.get('nombre_usuario', None)
     password = request.json.get('password', None)
     email = request.json.get('email', None)
+    user_img = request.json.get('user_img', "")
 
     user = User.query.filter_by(nombre_usuario=nombre_usuario).first()
 
@@ -91,6 +92,7 @@ def register():
         nombre_usuario=nombre_usuario,
         password=generate_password_hash(password),
         email=email,
+        avatar=user_img,
         perfil=newProfile)
 
     user.save()
