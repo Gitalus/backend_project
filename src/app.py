@@ -1,8 +1,9 @@
 import os
 
 from flask_mail import Mail, Message
-from flask import Flask, jsonify, request, url_for
+from flask import Flask, jsonify, request, url_for, render_template, make_response
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
+from werkzeug.datastructures import Headers
 from werkzeug.security import generate_password_hash, check_password_hash
 from db import db
 from flask_migrate import Migrate
@@ -62,8 +63,8 @@ def login():
     if user and check_password_hash(user.password, password):
         if user.confirmed_email:
             token = create_access_token(
-                identity=user.username,
-                expires_delta=timedelta(hours=5)
+                identity=user.id,
+                expires_delta=timedelta(weeks=1)
             )
             return jsonify(access_token=token)
         else:
@@ -126,9 +127,16 @@ def confirm_email(token):
         return jsonify(message="The token is expired.")
 
     user = User.query.get(user_id)
-    user.confirmed_email = True
-    user.save()
-    return jsonify(status="confirmed", user=user.serialize())
+    if user:
+        user.confirmed_email = True
+        user.save()
+        headers = {
+            "Content-Type": "text/html"
+        }
+        # return redirect("page/confirmed", code=302)
+        return make_response(render_template("confirm_page.html", email=user.email), 200, headers)
+    else:
+        return jsonify(message="User not found"), 400
 
 
 if __name__ == '__main__':
