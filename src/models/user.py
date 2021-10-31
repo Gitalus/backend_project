@@ -10,6 +10,9 @@ class User(db.Model):
     password = db.Column(db.String(200), nullable=False)
     confirmed_email = db.Column(db.Boolean, default=False)
 
+    def __repr__(self) -> str:
+        return f'Username: {self.username},\nemail: {self.email}'
+
     def serialize(self):
         return {
             "username": self.username,

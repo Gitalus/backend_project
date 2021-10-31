@@ -24,7 +24,7 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['ENV'] = 'development'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = os.environ.get(
+app.config['JWT_SECRET_KEY'] = os.getenv(
     'JWT_SECRET_KEY', 'development_only')
 
 # or other relevant config var
@@ -98,28 +98,35 @@ def register():
         email=email)
 
     user.save()
-    emailToken = serializer.dumps(email, salt='asdasdaseqwe123123')
-    msg = Message('Confirm Email',
-                  sender=app.config['MAIL_USERNAME'], recipients=[email])
+    emailToken = serializer.dumps(user.id, salt=app.config['JWT_SECRET_KEY'])
+    msg = Message(
+        'Confirm Email',
+        sender=app.config['MAIL_USERNAME'], recipients=[email])
     link = url_for('confirm_email', token=emailToken, _external=True)
 
     msg.body = f'Your link is: {link}'
 
     mail.send(msg)
 
-    return jsonify(email=email,
-                   username=username,
-                   status="ok"
-                   )
+    return jsonify(
+        email=email,
+        username=username,
+        status="ok"
+    )
 
 
 @app.route('/confirm_email/<token>')
 def confirm_email(token):
     try:
-        email = serializer.loads(token, salt='email-confirm', max_age=120)
+        user_id = serializer.loads(
+            token, salt=app.config['JWT_SECRET_KEY'], max_age=300)
     except SignatureExpired:
         return jsonify(message="The token is expired.")
-    return jsonify(status="confirmed")
+
+    user = User.query.get(user_id)
+    user.confirmed_email = True
+    user.save()
+    return jsonify(status="confirmed", user=user.serialize())
 
 
 if __name__ == '__main__':
