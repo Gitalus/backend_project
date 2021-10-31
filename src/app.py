@@ -59,16 +59,18 @@ def login():
     password = request.json.get('password', None)
     user = User.query.filter_by(username=username).first()
 
-    if user is None or not check_password_hash(user.password, password):
+    if user and check_password_hash(user.password, password):
+        if user.confirmed_email:
+            token = create_access_token(
+                identity=user.username,
+                expires_delta=timedelta(hours=5)
+            )
+            return jsonify(access_token=token)
+        else:
+            return jsonify(message='email not verified, please check your mail inbox to validate it'), 403
 
+    else:
         return jsonify(message="Bad username or password."), 400
-
-    token = create_access_token(
-        identity=user.username,
-        expires_delta=timedelta(hours=5)
-    )
-
-    return jsonify(access_token=token)
 
 
 @app.route('/api/register', methods=['POST'])
