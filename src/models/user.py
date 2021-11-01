@@ -1,14 +1,20 @@
+import uuid
 from db import db
+from uuid import uuid4
 
 
 class User(db.Model):
     __tablename__ = 'users'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(50), primary_key=True)
     username = db.Column(db.String(100), nullable=False, unique=True)
     email = db.Column(db.String(200), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)
     confirmed_email = db.Column(db.Boolean, default=False)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.id = uuid4().hex
 
     def __repr__(self) -> str:
         return f'Username: {self.username},\nemail: {self.email}'

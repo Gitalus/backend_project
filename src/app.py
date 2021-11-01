@@ -53,6 +53,14 @@ def get_home():
     return "<h1>Serenity REST API</h1>"
 
 
+# @app.route('/api/test')
+# @jwt_required()
+# def test():
+#     user_id = get_jwt_identity()
+#     user = User.query.get(user_id)
+#     return jsonify(user.serialize())
+
+
 @app.route('/api/auth', methods=['POST'])
 def login():
     username = request.json.get('username', None)
