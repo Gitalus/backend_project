@@ -3,7 +3,6 @@ import os
 from flask_mail import Mail, Message
 from flask import Flask, jsonify, request, url_for, render_template, make_response
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
-from werkzeug.datastructures import Headers
 from werkzeug.security import generate_password_hash, check_password_hash
 from db import db
 from flask_migrate import Migrate
@@ -89,7 +88,7 @@ def register():
     if user:
         return jsonify(message=f"E-mail '{email}' already in use.", status="error"), 400
 
-    if username is None and password is None and email is None:
+    if username is None or password is None or email is None:
         return jsonify(message="You must include a username, a password and an email.", status="error"), 400
 
     if username == "" and password == "" and email == "":
@@ -107,13 +106,12 @@ def register():
         sender=app.config['MAIL_USERNAME'], recipients=[email])
     link = url_for('confirm_email', token=emailToken, _external=True)
 
-    msg.body = f'Your link is: {link}'
+    msg.body = f'Confirm email account link: {link}'
 
     mail.send(msg)
 
     return jsonify(
-        email=email,
-        username=username,
+        user=user.serialize(),
         status="ok"
     )
 
