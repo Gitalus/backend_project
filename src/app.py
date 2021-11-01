@@ -1,4 +1,4 @@
-import os
+from dotenv import load_dotenv
 
 from flask_mail import Mail, Message
 from flask import Flask, jsonify, request, url_for, render_template, make_response
@@ -12,27 +12,13 @@ from datetime import timedelta
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
 
+load_dotenv('.env', verbose=True)
 # app config
 app = Flask(__name__)
 app.url_map.slashes = False
-app.config['DEBUG'] = True
-app.config['MAIL_SERVER'] = "smtp.gmail.com"
-app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
-app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
-app.config['ENV'] = 'development'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = os.getenv(
-    'JWT_SECRET_KEY', 'development_only')
+app.config.from_object('default_config')
+app.config.from_envvar('APPLICATION_SETTINGS')
 
-# or other relevant config var
-uri = os.getenv("DATABASE_URL", "sqlite:///database.db")
-if uri.startswith("postgres://"):
-    uri = uri.replace("postgres://", "postgresql://", 1)
-# rest of connection code using the connection string `uri`
-app.config['SQLALCHEMY_DATABASE_URI'] = uri
 
 MIGRATE = Migrate(app, db)
 jwt = JWTManager(app)
