@@ -6,7 +6,7 @@ from uuid import uuid4
 class User(db.Model):
     __tablename__ = 'users'
 
-    id = db.Column(db.String(50), primary_key=True)
+    id = db.Column(db.String(100), primary_key=True)
     username = db.Column(db.String(100), nullable=False, unique=True)
     email = db.Column(db.String(200), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)
