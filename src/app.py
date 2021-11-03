@@ -115,9 +115,9 @@ def confirm_email(token):
     if user:
         user.confirmed_email = True
         user.save()
-        headers = {
-            "Content-Type": "text/html"
-        }
+        # headers = {
+        #     "Content-Type": "text/html"
+        # }
         return redirect(f"http://localhost:3000/confirm-email/{user.email}", code=302)
         # return make_response(render_template("confirm_page.html", email=user.email), 200, headers)
     else:
