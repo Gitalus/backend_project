@@ -5,6 +5,5 @@ uwsgi
 flask-cors
 flask-mail
 Flask-Migrate
-marshmallow
 # library to interact with postgre:
 psycopg2

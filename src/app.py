@@ -2,14 +2,17 @@ from flask import Flask, jsonify, request, url_for, render_template, make_respon
 from db import db
 from flask_cors import CORS
 from flask_migrate import Migrate
-
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from dotenv import load_dotenv
 from flask_mail import Mail, Message
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from werkzeug.security import generate_password_hash, check_password_hash
+
+from models.notes import Note
+from models.calendar import Fecha
+from models.profile import Profile
 from models.user import User
 from datetime import timedelta
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 
 
 load_dotenv('.env', verbose=True)
@@ -41,9 +44,9 @@ def get_home():
 
 @app.route('/api/auth', methods=['POST'])
 def login():
-    username = request.json.get('username', None)
+    nombre_usuario = request.json.get('nombre_usuario', None)
     password = request.json.get('password', None)
-    user = User.query.filter_by(username=username).first()
+    user = User.query.filter_by(nombre_usuario=nombre_usuario).first()
 
     if user and check_password_hash(user.password, password):
         if user.confirmed_email:
@@ -61,30 +64,34 @@ def login():
 
 @app.route('/api/register', methods=['POST'])
 def register():
-    username = request.json.get('username', None)
+    nombre_usuario = request.json.get('nombre_usuario', None)
     password = request.json.get('password', None)
     email = request.json.get('email', None)
+    user_img = request.json.get('user_img', "")
 
-    user = User.query.filter_by(username=username).first()
+    user = User.query.filter_by(nombre_usuario=nombre_usuario).first()
 
     if user:
-        return jsonify(message=f"User '{username}' already exists.", status="error"), 400
+        return jsonify(message=f"El usuario '{nombre_usuario}' ya existe.", status="error"), 400
 
     user = User.query.filter_by(email=email).first()
 
     if user:
-        return jsonify(message=f"E-mail '{email}' already in use.", status="error"), 400
+        return jsonify(message=f"E-mail '{email}' ya está en uso.", status="error"), 400
 
-    if username is None or password is None or email is None:
-        return jsonify(message="You must include a username, a password and an email.", status="error"), 400
+    if nombre_usuario is None or password is None or email is None:
+        return jsonify(message="Debes incluir un nombre de usuario, email y contraeña.", status="error"), 400
 
-    if username == "" or password == "" or email == "":
-        return jsonify(message="You must include a username, a password and an email.", status="error"), 400
+    if nombre_usuario == "" or password == "" or email == "":
+        return jsonify(message="Debes incluir un nombre de usuario, email y contraeña.", status="error"), 400
 
+    newProfile = Profile()
+    newProfile.avatar = user_img
     user = User(
-        username=username,
+        nombre_usuario=nombre_usuario,
         password=generate_password_hash(password),
-        email=email)
+        email=email,
+        perfil=newProfile)
 
     user.save()
     emailToken = serializer.dumps(user.id, salt=app.config['JWT_SECRET_KEY'])

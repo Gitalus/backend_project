@@ -5,9 +5,15 @@ class Profile(db.Model):
     __tablename__ = 'profiles'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), nullable=False)
-    avatar = db.Column(db.BLOB)
+    nombre = db.Column(db.String(200), default="")
+    avatar = db.Column(db.Text, default="")
 
-    user_id = db.Column(db.Integer, db.ForeignKey(
-        'users.id'), unique=True, nullable=False)
-    user = db.relationship('User', backref='profile', lazy='dynamic')
+    calendario = db.relationship('Fecha', cascade="all, delete-orphan")
+
+    def serialize(self):
+        return {
+            "nombre": self.nombre,
+            "notas": [nota.serialize() for nota in self.notas],
+            "user_img": self.avatar,
+            "calendario": {fecha.fecha: fecha.category for fecha in self.calendario}
+        }

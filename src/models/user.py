@@ -6,7 +6,7 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.String(100), primary_key=True)
-    username = db.Column(db.String(100), nullable=False, unique=True)
+    nombre_usuario = db.Column(db.String(100), nullable=False, unique=True)
     email = db.Column(db.String(200), nullable=False, unique=True)
     password = db.Column(db.String(200), nullable=False)
     confirmed_email = db.Column(db.Boolean, default=False)
@@ -18,10 +18,15 @@ class User(db.Model):
     def __repr__(self) -> str:
         return f'Username: {self.username},\nemail: {self.email}'
 
+    perfil_id = db.Column(db.Integer, db.ForeignKey(
+        'profiles.id'), unique=True)
+    perfil = db.relationship('Profile', backref='usuario', uselist=False)
+
     def serialize(self):
         return {
-            "username": self.username,
-            "email": self.email
+            "nombre_usuario": self.nombre_usuario,
+            "email": self.email,
+            "perfil": self.perfil.serialize()
         }
 
     def save(self):
