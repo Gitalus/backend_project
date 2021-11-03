@@ -3,7 +3,7 @@ from db import db
 from flask_cors import CORS
 from flask_migrate import Migrate
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from flask_mail import Mail, Message
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -16,11 +16,27 @@ from models.user import User
 from datetime import timedelta
 
 
-load_dotenv('.env', verbose=True)
 # app config
 app = Flask(__name__)
 app.url_map.slashes = False
-app.config.from_object('default_config')
+
+app.config["DEBUG"] = True
+uri = os.getenv("DATABASE_URL", "sqlite:///database.db")
+if uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+app.config["SQLALCHEMY_DATABASE_URI"] = uri
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["JWT_SECRET_KEY"] = os.getenv('JWT_SECRET_KEY')
+app.config["MAIL_SERVER"] = "smtp.gmail.com"
+app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
+app.config["MAIL_PORT"] = 587
+app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USE_SSL"] = False
+app.config["ENV"] = 'development'
+
+
+# app.config.from_object('default_config')
 
 
 MIGRATE = Migrate(app, db)
