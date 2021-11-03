@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, url_for, render_template, make_response, redirect
+from flask import Flask, jsonify, request, url_for, redirect
 from db import db
 from flask_cors import CORS
 from flask_migrate import Migrate
@@ -130,6 +130,84 @@ def confirm_email(token):
     else:
         return jsonify(message="User not found"), 400
 
+
+@app.route('/api/users')
+def get_users():
+    return jsonify(users=[user.serialize() for user in User.query.all()])
+
+
+@app.route('/api/profile', methods=['PUT'])
+@jwt_required()
+def update_profile():
+    nombre = request.json.get('nombre')
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    user.perfil.nombre = nombre
+    user.save()
+
+    return jsonify(user.serialize())
+
+
+@app.route('/api/profile')
+@jwt_required()
+def get_profile():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    return jsonify(user.serialize())
+
+
+@app.route('/api/note', methods=['POST'])
+@jwt_required()
+def create_note():
+    nota = Note()
+    nota.titulo = request.json.get('titulo')
+    nota.contenido = request.json.get('contenido')
+    nota.categoria = request.json.get('categoria')
+
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    nota.perfil = user.perfil
+    nota.save()
+
+    return jsonify(nota.serialize())
+
+
+@app.route('/api/calendar', methods=['POST'])
+@jwt_required()
+def save_calendar():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    user.perfil.calendario = []
+    for fecha, category in request.get_json().items():
+        newFecha = Fecha(fecha=fecha, category=category)
+        user.perfil.calendario.append(newFecha)
+    user.save()
+
+    return jsonify(message="added_calendar")
+
+
+@app.route('/api/tokencheck', methods=['POST'])
+@jwt_required()
+def check_token():
+    user_id = get_jwt_identity()
+    token = create_access_token(
+        identity=user_id,
+        expires_delta=timedelta(weeks=1)
+    )
+    return jsonify(access_token=token)
+
+
+@app.route('/api/note/<int:_id>', methods=['DELETE'])
+@jwt_required()
+def delete_note(_id):
+    note = Note.query.get(_id)
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    user.perfil.notas.remove(note)
+    user.save()
+
+    return jsonify(user.serialize())
 
 # @app.route('/api/test')
 # @jwt_required()
