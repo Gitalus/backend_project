@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, url_for, redirect
+from flask import Flask, json, jsonify, request, url_for, redirect
 from db import db
 from flask_cors import CORS
 from flask_migrate import Migrate
@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from flask_mail import Mail, Message
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
 from models.notes import Note
 from models.calendar import Fecha
@@ -125,7 +126,7 @@ def confirm_email(token):
         # headers = {
         #     "Content-Type": "text/html"
         # }
-        return redirect(f"http://localhost:3000/confirm-email/{user.email}", code=302)
+        return redirect(f"{os.getenv('CLIENT_FRONT_URL')}/confirm-email/{user.email}", code=302)
         # return make_response(render_template("confirm_page.html", email=user.email), 200, headers)
     else:
         return jsonify(message="User not found"), 400
@@ -218,6 +219,39 @@ def delete_note(_id):
 #         return jsonify(user.serialize())
 #     else:
 #         return jsonify(message='Usuario sin confimar email')
+
+
+@app.route('/api/reset-password', methods=['POST'])
+def resetPassword():
+    emailToken = request.json.get('emailToken')
+    password = request.json.get('password')
+
+    email = serializer.loads(
+        emailToken, salt=app.config['JWT_SECRET_KEY'], max_age=300)
+
+    user = User.query.filter_by(email=email).first()
+    if user:
+        user.password = generate_password_hash(password)
+        user.save()
+        return jsonify(message='succed changing password'), 200
+    return jsonify(message='User does not exists with that email'), 400
+
+
+@app.route('/api/reset-by-mail', methods=['POST'])
+def sendMailReset():
+    email = request.json.get('email')
+    emailToken = serializer.dumps(email, salt=app.config['JWT_SECRET_KEY'])
+    msg = Message(
+        'Reset password',
+        sender=app.config['MAIL_USERNAME'], recipients=[email])
+    linkFront = f'{os.getenv("CLIENT_FRONT_URL")}/forgot-password/{emailToken}'
+    # link = url_for('reset-password', token=emailToken, _external=True)
+
+    msg.body = f'Reiniciar contraseña url: {linkFront}'
+
+    mail.send(msg)
+
+    return jsonify(message='email sended')
 
 
 if __name__ == '__main__':
