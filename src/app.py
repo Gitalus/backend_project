@@ -1,4 +1,4 @@
-from flask import Flask, json, jsonify, request, url_for, redirect
+from flask import Flask, jsonify, request, url_for, redirect
 from db import db
 from flask_cors import CORS
 from flask_migrate import Migrate
