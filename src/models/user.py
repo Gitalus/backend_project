@@ -1,6 +1,5 @@
-import uuid
-from db import db
 from uuid import uuid4
+from db import db
 
 
 class User(db.Model):

@@ -1,12 +1,12 @@
-from dotenv import load_dotenv
+from flask import Flask, jsonify, request, url_for, render_template, make_response, redirect
+from db import db
+from flask_cors import CORS
+from flask_migrate import Migrate
 
+from dotenv import load_dotenv
 from flask_mail import Mail, Message
-from flask import Flask, jsonify, request, url_for, render_template, make_response
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required, JWTManager
 from werkzeug.security import generate_password_hash, check_password_hash
-from db import db
-from flask_migrate import Migrate
-from flask_cors import CORS
 from models.user import User
 from datetime import timedelta
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired
@@ -37,14 +37,6 @@ def create_tables():
 @app.route('/')
 def get_home():
     return "<h1>Serenity REST API</h1>"
-
-
-# @app.route('/api/test')
-# @jwt_required()
-# def test():
-#     user_id = get_jwt_identity()
-#     user = User.query.get(user_id)
-#     return jsonify(user.serialize())
 
 
 @app.route('/api/auth', methods=['POST'])
@@ -79,13 +71,14 @@ def register():
         return jsonify(message=f"User '{username}' already exists.", status="error"), 400
 
     user = User.query.filter_by(email=email).first()
+
     if user:
         return jsonify(message=f"E-mail '{email}' already in use.", status="error"), 400
 
     if username is None or password is None or email is None:
         return jsonify(message="You must include a username, a password and an email.", status="error"), 400
 
-    if username == "" and password == "" and email == "":
+    if username == "" or password == "" or email == "":
         return jsonify(message="You must include a username, a password and an email.", status="error"), 400
 
     user = User(
@@ -125,10 +118,21 @@ def confirm_email(token):
         headers = {
             "Content-Type": "text/html"
         }
-        # return redirect("page/confirmed", code=302)
-        return make_response(render_template("confirm_page.html", email=user.email), 200, headers)
+        return redirect(f"http://localhost:3000/confirm-email/{user.email}", code=302)
+        # return make_response(render_template("confirm_page.html", email=user.email), 200, headers)
     else:
         return jsonify(message="User not found"), 400
+
+
+# @app.route('/api/test')
+# @jwt_required()
+# def test():
+#     user_id = get_jwt_identity()
+#     user = User.query.get(user_id)
+#     if user.confirmed_email:
+#         return jsonify(user.serialize())
+#     else:
+#         return jsonify(message='Usuario sin confimar email')
 
 
 if __name__ == '__main__':
