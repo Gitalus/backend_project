@@ -21,7 +21,6 @@ load_dotenv('.env', verbose=True)
 app = Flask(__name__)
 app.url_map.slashes = False
 app.config.from_object('default_config')
-app.config.from_envvar('APPLICATION_SETTINGS')
 
 
 MIGRATE = Migrate(app, db)
